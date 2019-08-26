@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:v-for="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta charset="UTF-8">
+        <title>设备详情</title>
+        <link rel="stylesheet" th:href="@{/my/plugins/bootstrap/bootstrap.css}">
+        <!--<link rel="stylesheet" th:href="@{/my/plugins/bootstrap/bootstrap-table.css}">-->
+        <link rel="stylesheet" th:href="@{/my/plugins/vali/main.css}">
+        <link rel="stylesheet" th:href="@{/my/plugins/font-awesome.css}">
+        <link rel="stylesheet" th:href="@{/my/plugins/fontawesome-free-5.9.0-web/css/all.css}">
+        <script th:src="@{/my/plugins/jquery/dist/jquery.js}"></script>
+        <script th:src="@{/my/plugins/vue/dist/vue.js}"></script>
+        <script th:src="@{/my/plugins/node_modules/axios/dist/axios.js}"></script>
+        <script th:src="@{/my/plugins/bootstrap/bootstrap.js}"></script>
+        <!--<script th:src="@{/my/plugins/bootstrap/bootstrap-table.js}"></script>-->
+        <script th:src="@{/my/plugins/vali/main.js}"></script>
+        <script th:src="@{/my/plugins/vali/popper.min.js}"></script>
+        <style>
+            .app-content {
+                /*background-color: #474f61;*/
+                background-color: #212529;
+                min-height: calc(100vh - 55px);
+                margin: 0;
+                padding: 0 10px 0 10px;
+            }
+
+            .app-title {
+                background-color: #20242d;
+                margin: 0;
+                margin-top: 5px;
+                padding-bottom: 5px;
+                color: #fff;
+            }
+
+            .row {
+                margin-right: 0px;
+                margin-left: 0px;
+            }
+
+            .tile {
+                background-color: #20242d;
+                box-shadow: none;
+                padding: 0;
+                margin-bottom: 0;
+            }
+
+            .toggle {
+                font-size: 1.5rem;
+                color: #ffffff;
+                padding-top: 20px;
+                padding-bottom: 20px;
+            }
+
+            .toggle input[type="checkbox"] + .button-indecator {
+                display: inline-block;
+            }
+
+            /*.table > tbody > tr > td {*/
+            /*border: 0px;*/
+            /*}*/
+
+            /*.table-title {*/
+            /*color: #ffffff;*/
+            /*}*/
+            .table {
+                margin-bottom: 0;
+                border-right: 1px solid rgb(221, 221, 221);
+                /*margin-bottom: -1px;*/
+                /*border: 1px solid rgb(221, 221, 221);*/
+            }
+
+            .table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
+                border-top: 0;
+            }
+
+            .col-md-12 {
+                padding-right: 0;
+                padding-left: 0;
+            }
+        </style>
+    </head>
+    <body class="app-content">
+        <div class="app-title">
+            <div>
+                <h1><i class="fa fa-crosshairs"></i> 真空设备</h1>
+                <p onclick="reload()">设备详情</p>
+            </div>
+
+            <ul class="app-breadcrumb breadcrumb">
+                <li class="breadcrumb-item"><i class="fas fa-reply"></i></li>
+                <li class="breadcrumb-item"><a href="javascript:history.back(-1)">返回</a></li>
+            </ul>
+        </div>
+        <div class="row" id="row_client">
+            <div class="col-md-12">
+                <div class="tile">
+                    <div class="tile-body" id="tile_body">
+                        <div class="col-md-12">
+                            <div class="col-md-12 table-responsive">
+                                <table data-toggle="table" class="table table-dark" id="table_2"
+                                       data-show-header="false">
+                                    <!--<thead>-->
+                                    <!--<tr>-->
+                                    <!--<th data-valign="middle" data-halign="center">name</th>-->
+                                    <!--<th data-valign="middle" data-align="right">value</th>-->
+                                    <!--<th data-valign="middle" data-align="right">value</th>-->
+                                    <!--<th data-valign="middle" data-align="right">value</th>-->
+                                    <!--</tr>-->
+                                    <!--</thead>-->
+                                    <tbody>
+
+                                    <tr v-for="(s,index) in microwave">
+                                        <td style="">{{s[0].name.split('-')[0]}}</td>
+                                        <td v-for="ss in s" style="" class="toggle">
+                                            <input type="checkbox" v-model="ss.status"><span
+                                                class="button-indecator"></span>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </body>
+    <script>
+        var app = new Vue({
+            el: "#tile_body",
+            data() {
+                return {
+                    digital: "1",
+                    sensors: [],
+                    microwave: []
+                }
+            },
+            mounted() {
+                var _this = this;
+                window.setInterval("getSensors()", 1000);
+            }
+        })
+
+        // window.onload = function () {
+        //     window.setInterval("getSensors()", 1000);
+        // }
+
+        function getSensors() {
+            axios.get('/sensor/get')
+                .then(function (response) {
+                    if (response.status === 200) {
+                        app.sensors = response.data;
+                        var microwave_list = response.data.filter(function (e) {
+                            return e.name.search("微波") != -1;
+                        });
+                        var indexList = [];
+                        var reg = new RegExp("")
+                        for (var i = 0; i < microwave_list.length; i++) {
+                            var index = microwave_list[i].name.split("-")[0].replace(/\D/g, "");
+                            if (indexList.indexOf(index) == -1) {
+                                indexList.push(index);
+                            }
+                        }
+                        indexList = indexList.sort();
+                        var microwaveData = [];
+                        for (var i = 0; i < indexList.length; i++) {
+                            var microwaveTemp = microwave_list.filter(function (e) {
+                                return e.name.split("-")[0].replace(/\D/g, "") == indexList[i];
+                            })
+                            microwaveData.push(microwaveTemp);
+                        }
+                        app.microwave = microwaveData;
+                        // console.log(response)
+
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+
+        var str = "";
+        // alert(str.contains("11"))
+    </script>
+</html>

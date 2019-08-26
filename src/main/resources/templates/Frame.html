@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:v-for="http://www.w3.org/1999/xhtml"
+      xmlns:v-on="http://www.w3.org/1999/xhtml">
+    <head th:fragment="header(title,links,scripts,styles)">
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+        <title>中国电子科技集团公司第十二研究所</title>
+        <script th:src="@{/my/plugins/jquery/dist/jquery.js}"></script>
+        <link rel="stylesheet" th:href="@{/my/plugins/layui-v2.5.4/css/layui.css}">
+        <script th:src="@{/my/plugins/layui-v2.5.4/layui.js}"></script>
+        <script th:src="@{/my/plugins/vue/dist/vue.js}"></script>
+        <script th:src="@{/my/plugins/node_modules/axios/dist/axios.js}"></script>
+        <style>
+            .layui-header {
+                display: flex;
+            }
+
+            .layui-logo {
+                flex: none;
+                position: relative !important;
+            }
+
+            .app-nav {
+                display: inline-flex !important;
+                flex: 1 0 auto;
+                position: relative;
+            }
+
+            .app-header-title {
+                -webkit-box-flex: 1;
+                -ms-flex: 1 0 auto;
+                flex: 1 0 auto;
+                color: #fff;
+                text-align: center;
+                font-family: '幼圆';
+                padding: 0 15px;
+                font-size: 30px;
+                font-weight: 800;
+                line-height: 40px;
+                margin-top: 8px;
+            }
+
+            .app-nav {
+                flex: 1 0 auto;
+            }
+
+            [v-cloak] {
+                display: none;
+            }
+
+            iframe {
+                border: none;
+            }
+
+            #main_iframe {
+                width: 100%;
+                height: calc(100vh - 104px);
+                display: block;
+            }
+        </style>
+        <script type="text/javascript">
+            window.onload = function () {
+                var vue = new Vue({
+                    el: '#layout-side',
+                    data() {
+                        return {
+                            menu: [{
+                                name: "test",
+                                child: [{
+                                    name: "child1",
+                                    children: {}
+                                }, {
+                                    name: "child2",
+                                    children: {}
+                                }]
+                            }]
+                        }
+                    },
+                    mounted() {
+                        var _this = this;
+                        axios.get('/Menus/get')
+                            .then(function (response) {
+                                if (response.status === 200) {
+                                    _this.menu = response.data;
+                                    layui.use('element', function () {
+                                        var element = layui.element;
+
+                                    });
+                                }
+                                console.log(response);
+                            })
+                            .catch(function (error) {
+                                console.log(error);
+                            });
+                        // layui.use('element', function () {
+                        //     var element = layui.element;
+                        //
+                        // });
+                    },
+                    methods: {
+                        setClass_by_index(index) {
+                            if (index == 0) {
+                                return "layui-nav-item layui-nav-itemed"
+                            } else {
+                                return "layui-nav-item"
+                            }
+                        },
+                        change_iframe_src(url){
+                            $('#main_iframe').attr('src',url)
+                        }
+                    }
+                });
+
+
+            };
+        </script>
+    </head>
+    <body class="layui-layout-body">
+        <div class="layui-layout layui-layout-admin">
+            <div class="layui-header">
+                <div class="layui-logo">
+                    <img th:src="@{/my/content/image/logo-12.png}"/>
+                </div>
+                <!-- 头部区域（可配合layui已有的水平导航） -->
+                <ul class="layui-nav app-nav" style="justify-content:center">
+                    <li class="">
+                        <h3 class="app-header-title" href="#">中国电子科技集团公司第十二研究所</h3>
+                    </li>
+
+                </ul>
+
+
+                <!--<ul class="layui-nav layui-layout-left">-->
+                <!--<li class="layui-nav-item"><a href="">控制台</a></li>-->
+                <!--<li class="layui-nav-item"><a href="">商品管理</a></li>-->
+                <!--<li class="layui-nav-item"><a href="">用户</a></li>-->
+                <!--<li class="layui-nav-item">-->
+                <!--<a href="javascript:;">其它系统</a>-->
+                <!--<dl class="layui-nav-child">-->
+                <!--<dd><a href="">邮件管理</a></dd>-->
+                <!--<dd><a href="">消息管理</a></dd>-->
+                <!--<dd><a href="">授权管理</a></dd>-->
+                <!--</dl>-->
+                <!--</li>-->
+                <!--</ul>-->
+                <!--<ul class="layui-nav layui-layout-right">-->
+                <!--<li class="layui-nav-item">-->
+                <!--<a href="javascript:;">-->
+                <!--<img src="http://t.cn/RCzsdCq" class="layui-nav-img">-->
+                <!--贤心-->
+                <!--</a>-->
+                <!--<dl class="layui-nav-child">-->
+                <!--<dd><a href="">基本资料</a></dd>-->
+                <!--<dd><a href="">安全设置</a></dd>-->
+                <!--</dl>-->
+                <!--</li>-->
+                <!--<li class="layui-nav-item"><a href="">退了</a></li>-->
+                <!--</ul>-->
+            </div>
+
+            <div id="layout-side" class="layui-side layui-bg-black">
+                <div class="layui-side-scroll">
+                    <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+                    <ul class="layui-nav layui-nav-tree" lay-filter="test" v-cloak>
+                        <li v-for="(m, index) in menu.nodes" :index="index"
+                            :class="setClass_by_index(index)">
+                            <a class="" href="javascript:;">{{m.nodeName}}</a>
+                            <dl v-if="m.children.length > 0" v-for="sub1 in m.children" class="layui-nav-child">
+                                <dd>
+                                    <a href="javascript:;" v-on:click="change_iframe_src(sub1.url)">{{sub1.nodeName}}</a>
+                                </dd>
+                            </dl>
+                        </li>
+
+                    </ul>
+
+                    <!--<ul class="layui-nav layui-nav-tree" lay-filter="test">-->
+                    <!--<li class="layui-nav-item layui-nav-itemed">-->
+                    <!--<a class="" href="javascript:;">所有商品</a>-->
+                    <!--<dl class="layui-nav-child">-->
+                    <!--<dd><a href="javascript:;">列表一</a></dd>-->
+                    <!--<dd><a href="javascript:;">列表二</a></dd>-->
+                    <!--<dd><a href="javascript:;">列表三</a></dd>-->
+                    <!--<dd><a href="">超链接</a></dd>-->
+                    <!--</dl>-->
+                    <!--</li>-->
+                    <!--<li class="layui-nav-item">-->
+                    <!--<a href="javascript:;">解决方案</a>-->
+                    <!--<dl class="layui-nav-child">-->
+                    <!--<dd><a href="javascript:;">列表一</a></dd>-->
+                    <!--<dd><a href="javascript:;">列表二</a></dd>-->
+                    <!--<dd><a href="">超链接</a></dd>-->
+                    <!--</dl>-->
+                    <!--</li>-->
+                    <!--<li class="layui-nav-item"><a href="">云市场</a></li>-->
+                    <!--<li class="layui-nav-item"><a href="">发布商品</a></li>-->
+                    <!--</ul>-->
+                </div>
+            </div>
+
+            <div class="layui-body">
+                <!-- 内容主体区域 -->
+                <!--<div style="padding: 15px;">内容主体区域</div>-->
+                <!--<iframe id="thingjs" src="http://www.thingjs.com/guide/sampleindex.html?m=oLX7p0wleY-kFSoOx6AtBFcv_bY8/toy.js?n=549"></iframe>-->
+                <iframe id="main_iframe" src="/microwave/index?id=1"></iframe>
+            </div>
+
+            <div class="layui-footer">
+                <!-- 底部固定区域 -->
+                © layui.com - 底部固定区域
+            </div>
+        </div>
+        <script>
+            //JavaScript代码区域
+            // layui.use('element', function () {
+            //     var element = layui.element;
+            //
+            // });
+        </script>
+    </body>
+</html>

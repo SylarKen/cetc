@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:v-on="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+        <script th:src="@{/my/plugins/jquery/dist/jquery.js}"></script>
+        <!--<link rel="stylesheet" th:href="@{/my/plugins/layui-v2.5.4/css/layui.css}">-->
+        <!--<script th:src="@{/my/plugins/layui-v2.5.4/layui.js}"></script>-->
+        <script th:src="@{/my/plugins/vue/dist/vue.js}"></script>
+        <script th:src="@{/my/plugins/node_modules/axios/dist/axios.js}"></script>
+        <script th:src="@{/my/plugins/tweenmax/TweenMax.js}"></script>
+        <script th:src="@{/my/plugins/raphael-2.1.4.min.js}"></script>
+        <script th:src="@{/my/plugins/justgage.js}"></script>
+        <script th:src="@{/my/plugins/DrawSVGPlugin.min.js}"></script>
+        <style>
+            html, body {
+                height: 100%;
+                width: 100%;
+                margin: 0;
+                padding: 0;
+            }
+
+            body {
+                background-color: #23262E;
+                /*background-image: url("/my/content/image/microwave.png");*/
+                /*background-size:100% 100%;*/
+                /*position:absolute;*/
+            }
+
+            .image-bg {
+                max-height: calc(100vh - 20px);
+                /*width: 100%;*/
+                max-width: 100%;
+                /*max-height: 100%;*/
+                /*padding-top: 25px;*/
+                /*padding-bottom: 25px;*/
+                /*margin-top: 25px;*/
+                /*margin-bottom: 25px;*/
+            }
+
+            .mask {
+                cursor: pointer;
+            }
+
+            .main-container {
+                display: grid;
+                grid-template-columns: 1fr;
+                grid-template-rows: 3fr 1fr;
+                height: 100vh;
+            }
+
+            .upper-container {
+                position: absolute;
+                background: linear-gradient(to top, #5564c2, #3a2e8d);
+            }
+
+            .lower-container {
+                background-color: #12132C;
+            }
+
+            .temperature-text {
+                position: relative;
+                /*bottom: 40px;*/
+                font-size: 20px;
+                /*width: 100%;*/
+                /*text-align: center;*/
+                user-select: none;
+            }
+
+            .temperature-element {
+                text-align: center;
+                display: inline-block;
+                width: 40px;
+                margin: 0 10px 0 10px;
+                opacity: 0.7;
+            }
+
+            .temperature-element-line {
+                font-size: 7px;
+            }
+
+            .temperature-graduation {
+                position: absolute;
+                left: calc(50% - 150px);
+                bottom: 25px;
+                user-select: none;
+            }
+
+            .slider-container {
+                width: 150px;
+                height: 80px;
+                margin-top: -30px;
+                margin-left: calc(50% - 187px);
+                position: relative;
+            }
+
+            .slider-button {
+                position: absolute;
+                left: 42px;
+                top: 5px;
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                background-color: #2724a2;
+                cursor: grab;
+                cursor: -webkit-grab;
+                cursor: -moz-grab;
+            }
+
+            .slider-icon {
+                margin-top: 16px;
+                margin-left: 21px;
+                color: white;
+            }
+
+            .humidity {
+                width: 100px;
+                height: 80px;
+                display: inline-block;
+                margin: 1em;
+                position: absolute;
+            }
+
+            .circle1 {
+                width: 100px;
+                height: 200px;
+                border: 10px solid #00F7DE;
+                border-radius: 100% 0 0 100%/50%;
+                border-right: none;
+            }
+
+            svg {
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
+        </style>
+
+    </head>
+    <body>
+        <input id="hd_id" type="hidden" th:value="${id}">
+        <div id="app">
+            <img th:id="mainImage" class="image-bg" th:src="@{/my/content/image/microwave.png}" alt="">
+            <div id="mask_top" class="mask" style="position:absolute;z-index:9999;" v-on:click="go_part1"></div>
+            <div id="mask_bottom" class="mask" style="position:absolute;z-index:9999;" v-on:click="go_part2"></div>
+            <img id="sensors_fan" v-for="s in sensors" v-if="s.sensor_type!=undefined && s.sensor_type==0"
+                 :src="getSensorSrc(s)" alt=""
+                 :style="getStyle(s)">
+            <img id="sensors" v-for="s in sensors" v-if="s.sensor_type!=undefined && s.sensor_type==1"
+                 :src="getSensorSrc(s)" alt=""
+                 :style="getStyle(s)">
+            <div class="upper-container" v-for="s in sensors" v-if="s.sensor_type!=undefined && s.sensor_type==2"
+                 :style="getStyle(s)">
+            </div>
+            <div id="g1"></div>
+            <!--<div v-for="s in sensors" v-if="s.sensor_type!=undefined && s.sensor_type==3" :id="getID(s)"-->
+            <!--:style="getStyle(s)">-->
+            <!--</div>-->
+            <svg width="100%" height="100%" version="1.1"
+                 xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="green_orange_red" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:rgb(0,255,0);
+stop-opacity:1"/>
+                        <stop offset="50%" style="stop-color:rgb(255,255,0);
+stop-opacity:1"/>
+                        <stop offset="100%" style="stop-color:rgb(255,0,0);
+stop-opacity:1"/>
+                    </linearGradient>
+                </defs>
+                <circle v-for="s in sensors" v-if="s.sensor_type!=undefined && s.sensor_type==3" :id="getID(s)"
+                        :style="getStyle(s)"
+                        :cx="getCircle_cx(s)" :cy="getCircle_cy(s)" :r="getCircle_r(s)" stroke="url(#green_orange_red)"
+                        stroke-width="8" fill="none"/>
+
+            </svg>
+            <div>
+                <span v-for="s in sensors" v-if="s.sensor_type!=undefined && s.sensor_type==4"
+                      :style="getStyle(s)"></span>
+            </div>
+        </div>
+        <script>
+
+
+            const sliderMinX = 0
+            const sliderMaxX = 240
+            const coldGradient = {
+                start: '#5564c2',
+                end: '#3a2e8d'
+            }
+            const hotGradient = {
+                start: '#f0ae4b',
+                end: '#9b4d1b'
+            }
+            // var mainImage = $('#mainImage');
+            // var mainImageSize_original = getNaturalSize(mainImage[0]);
+            // var mainImageSize_target = {width: mainImage.width(), height: mainImage.height()};
+            var vue = new Vue({
+                el: "#app",
+                data() {
+                    return {
+                        sensors: [],
+                        humiditys: [],
+                    }
+                },
+                filters: {
+                    round(num) {
+                        return Math.round(num)
+                    }
+                },
+                computed: {
+                    sliderStyle() {
+                        return `transform: translate3d(${ this.sliderX}px, 0, 0);`
+                    },
+                    currentTemperature() {
+                        const tempRangeStart = 10
+                        const tempRange = 20
+                        return (this.sliderX / sliderMaxX * tempRange) + tempRangeStart
+                    }
+                },
+                methods: {
+                    go_part1() {
+                        window.location.href = "/microwave/part?part=1";
+                    },
+                    go_part2() {
+                        window.location.href = "/microwave/part?part=2";
+                    },
+                    // getmainSrc(img) {
+                    //     return "/my/content/image/normal/" + img;
+                    // },
+                    getID(s) {
+                        return "div_humidity_" + s.id;
+                    },
+                    getSensorSrc(s) {
+                        if (s.status_type !== null && s.status_type === 0) {
+                            return "/my/content/image/" + (s.status === 1 ? "normal" : "fault") + "/" + s.image;
+                        }
+                    },
+                    getStyle(s) {
+                        var mainImage = $('#mainImage');
+                        var mainImageSize_original = getNaturalSize(mainImage[0]);
+                        var mainImageSize_target = {width: mainImage.width(), height: mainImage.height()};
+                        var coo = trans_coo(mainImageSize_original, mainImageSize_target, s.position_x, s.position_y, s.image_width, s.image_height);
+                        var style = "";
+                        if (s.sensor_type === undefined) {
+                            return style;
+                        } else if (s.sensor_type === 0 || s.sensor_type === 1) {
+                            style = "position: absolute; left:" + (coo.x ? coo.x : 0) + "px; top:"
+                                + (coo.y ? coo.y : 0) + "px; width: " + coo.w + "px; height:" + coo.h + "px;";
+                            return style;
+                        } else if (s.sensor_type === 2) {
+                            style = "position: absolute; left:" + (coo.x ? coo.x : 0) + "px; top:"
+                                + (coo.y ? coo.y : 0) + "px; width: " + coo.w + "px; height:" + coo.h + "px;";
+                            let targetGradient = coldGradient
+                            if (s.value >= s.value_alarm) {
+                                targetGradient = hotGradient
+                            }
+
+                            // if (this.gradientStart !== targetGradient.start) {
+                            //     TweenLite.to(div, 0.7, {
+                            //         'gradientStart': targetGradient.start,
+                            //         'gradientEnd': targetGradient.end
+                            //     })
+                            // }
+                            return style + `background: linear-gradient(to top, ${targetGradient.start}, ${targetGradient.end});`
+                        } else if (s.sensor_type === 3) {
+                            style = "left:" + (coo.x ? coo.x : 0) + "px; top:"
+                                + (coo.y ? coo.y : 0) + "px; width: " + coo.w + "px; height:" + coo.h + "px;";
+                            var g = null;
+                            var id = "div_humidity_" + s.id;
+                            for (var i = 0; i < this.humiditys.length; i++) {
+                                if (this.humiditys[i].target.length > 0 && this.humiditys[i].target[0].id === id) {
+                                    g = this.humiditys[i];
+                                    break;
+                                }
+                            }
+                            var value = s.value / 2 + 50;
+                            myTween = TweenLite.fromTo("#" + id, 0, {drawSVG: '50% 50%'}, {drawSVG: "50% " + value.toString() + "% "});
+                            return style;
+                        } else if (s.sensor_type === 4) {
+                            style = "position: absolute; left:" + (coo.x ? coo.x : 0) + "px; top:"
+                                + (coo.y ? coo.y : 0) + "px; width: " + coo.w + "px; height:" + coo.h + "px;background-color:" + (s.status === 1 ? "green" : "red") + ";";
+                            return style;
+                        }
+                        //     var g = null;
+                        //     var id = "div_humidity_" + s.id;
+                        //     for (var i = 0; i < this.humiditys.length; i++) {
+                        //         if (this.humiditys[i].config && this.humiditys[i].config.id === id) {
+                        //             g = this.humiditys[i];
+                        //             break;
+                        //         }
+                        //     }
+                        //     if (g === null) {
+                        //         g = new JustGage({
+                        //             id: id,
+                        //             value: s.value,
+                        //             min: 0,
+                        //             max: 100,
+                        //             title: "",
+                        //             label: "",
+                        //             humanFriendly: true,
+                        //             valueFontColor: "#ffffff",
+                        //             gaugeWidthScale: 0.8
+                        //         });
+                        //         if (g.config) {
+                        //             this.humiditys.push(g);
+                        //         }
+                        //     } else {
+                        //         g.refresh(s.value);
+                        //     }
+                        //     return style = "position: absolute; left:" + (coo.x ? coo.x : 0) + "px; top:"
+                        //         + (coo.y ? coo.y : 0) + "px; width: " + coo.w + "px; height:" + coo.h + "px;";
+                        // }
+
+                    },
+                    bgStyle(div, value, value_alarm) {
+                        style = "position: absolute; left:" + (coo.x ? coo.x : 0) + "px; top:"
+                            + (coo.y ? coo.y : 0) + "px; width: " + coo.w + "px; height:" + coo.h + "px;";
+                        let targetGradient = coldGradient
+                        if (value >= value_alarm) {
+                            targetGradient = hotGradient
+                        }
+
+                        // if (this.gradientStart !== targetGradient.start) {
+                        //     TweenLite.to(div, 0.7, {
+                        //         'gradientStart': targetGradient.start,
+                        //         'gradientEnd': targetGradient.end
+                        //     })
+                        // }
+                        return style + `background: linear-gradient(to top, ${targetGradient.start}, ${targetGradient.end});`
+                    },
+                    tempElementStyle(tempNumber) {
+                        const nearDistance = 3
+                        const liftDistance = 12
+
+                        const diff = Math.abs(this.currentTemperature - tempNumber)
+                        const distY = (diff / nearDistance) - 1
+                        const elementY = Math.min(distY * liftDistance, 0)
+                        return `transform: translate3d(0, ${elementY}px, 0)`
+                    },
+                    getCircle_cx(s) {
+                        var mainImage = $('#mainImage');
+                        var mainImageSize_original = getNaturalSize(mainImage[0]);
+                        var mainImageSize_target = {width: mainImage.width(), height: mainImage.height()};
+                        var coo = trans_coo(mainImageSize_original, mainImageSize_target, s.position_x + s.image_width / 2, s.position_y + s.image_height / 2, s.image_width, s.image_height);
+                        // var cx = s.position_x + s.image_width / 2;
+                        return coo.x;
+                    },
+                    getCircle_cy(s) {
+                        var mainImage = $('#mainImage');
+                        var mainImageSize_original = getNaturalSize(mainImage[0]);
+                        var mainImageSize_target = {width: mainImage.width(), height: mainImage.height()};
+                        var coo = trans_coo(mainImageSize_original, mainImageSize_target, s.position_x + s.image_width / 2, s.position_y + s.image_height / 2, s.image_width, s.image_height);
+                        // var cy = s.position_y + s.image_height / 2;
+                        return coo.y;
+                    },
+                    getCircle_r(s) {
+                        var mainImage = $('#mainImage');
+                        var mainImageSize_original = getNaturalSize(mainImage[0]);
+                        var mainImageSize_target = {width: mainImage.width(), height: mainImage.height()};
+                        var coo = trans_coo(mainImageSize_original, mainImageSize_target, s.position_x + s.image_width / 2, s.position_y + s.image_height / 2, s.image_width, s.image_height);
+                        var r = coo.w / 2;
+                        return r;
+                    },
+                    getStroke(s) {
+
+                        // if (g === null) {
+                        //     myTween = TweenLite.fromTo("#"+id, 3, {drawSVG: '50% 50%'}, {drawSVG: "50% 100% "});
+                        //     if (myTween.target.length>0) {
+                        //         this.humiditys.push(myTween);
+                        //     }
+                        // } else {
+                        //     myTween.refresh(s.value);
+                        // }
+                        // return style = "position: absolute; left:" + (coo.x ? coo.x : 0) + "px; top:"
+                        //     + (coo.y ? coo.y : 0) + "px; width: " + coo.w + "px; height:" + coo.h + "px;";
+                    }
+                },
+                mounted() {
+                    var _this = this;
+                    // var myTween = TweenLite.fromTo("#circle", 3, {drawSVG: '50% 50%'}, {drawSVG: "50% 100% "});
+
+                }
+            });
+            window.onload = function (ev) {
+                var mainImage = $('#mainImage');
+                console.log("11111111");
+                console.log(mainImage.offset().top + ";" + mainImage.offset().left);
+                console.log(mainImage.width() + ";" + mainImage.height());
+                repaint();
+                mainImageSize = getNaturalSize(mainImage[0]);
+                console.log(mainImageSize);
+                window.setInterval("getSensors(vue)", 1000);
+
+            }
+            window.onresize = function (ev) {
+                repaint();
+            }
+
+
+            function getSensors(el) {
+                var id = $('#hd_id').val();
+                axios.get('/sensor/get?id=' + id)
+                    .then(function (response) {
+                        if (response.status === 200) {
+                            el.sensors = response.data;
+                            console.log(response)
+
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            }
+
+            function repaint() {
+                var mainImage = $('#mainImage');
+                var mask_top = $("#mask_top");
+                mask_top.css("width", mainImage.width());
+                mask_top.css("height", mainImage.height() / 2);
+                mask_top.css("top", mainImage.offset().top);
+                mask_top.css("left", mainImage.offset().left);
+                var mask_bottom = $("#mask_bottom");
+                mask_bottom.css("width", mainImage.width());
+                mask_bottom.css("height", mainImage.height() / 2);
+                mask_bottom.css("top", mainImage.offset().top + mask_top.height());
+                mask_bottom.css("left", mainImage.offset().left);
+
+                vue.$forceUpdate();
+            }
+
+            function getNaturalSize(image) {
+                var natureSize = {};
+                if (image.naturalWidth && image.naturalHeight) {
+                    natureSize.width = image.naturalWidth;
+                    natureSize.height = image.naturalHeight;
+                } else {
+                    var img = new Image();
+                    img.src = image.src;
+                    natureSize.width = img.width;
+                    natureSize.height = img.height;
+                }
+                return natureSize;
+            }
+
+            function trans_coo(original, target, x, y, w, h) {
+                var newCoo = {};
+                newCoo.x = x * (target.width / original.width);
+                newCoo.y = y * (target.height / original.height);
+                newCoo.w = w * (target.width / original.width);
+                newCoo.h = h * (target.height / original.height);
+                return newCoo;
+            }
+        </script>
+        <script>
+            // new Vue({
+            //     el: '#app1',
+            //     data: {
+            //         temperatureGrades: [10, 15, 20, 25, 30],
+            //         dragging: false,
+            //         initialMouseX: 0,
+            //         sliderX: 0,
+            //         initialSliderX: 0,
+            //         gradientStart: coldGradient.start,
+            //         gradientEnd: coldGradient.end
+            //     },
+            //     filters: {
+            //         round(num) {
+            //             return Math.round(num)
+            //         }
+            //     },
+            //     computed: {
+            //         sliderStyle() {
+            //             return `transform: translate3d(${ this.sliderX}px, 0, 0);`
+            //         },
+            //         bgStyle() {
+            //             return `background: linear-gradient(to bottom right, ${this.gradientStart}, ${this.gradientEnd});`
+            //         },
+            //         currentTemperature() {
+            //             const tempRangeStart = 10
+            //             const tempRange = 20
+            //             return (this.sliderX / sliderMaxX * tempRange) + tempRangeStart
+            //         }
+            //     },
+            //     methods: {
+            //         startDrag(e) {
+            //             this.dragging = true
+            //             this.initialMouseX = e.pageX
+            //             this.initialSliderX = this.sliderX
+            //         },
+            //         stopDrag() {
+            //             this.dragging = false
+            //         },
+            //         mouseMoving(e) {
+            //             if (this.dragging) {
+            //                 const dragAmount = e.pageX - this.initialMouseX
+            //                 const targetX = this.initialSliderX + dragAmount
+            //                 this.sliderX = Math.max(Math.min(targetX, sliderMaxX), sliderMinX)
+            //
+            //                 let targetGradient = coldGradient
+            //                 if (this.currentTemperature >= 25) {
+            //                     targetGradient = hotGradient
+            //                 }
+            //
+            //                 if (this.gradientStart !== targetGradient.start) {
+            //                     TweenLite.to(this, 0.7, {
+            //                         'gradientStart': targetGradient.start,
+            //                         'gradientEnd': targetGradient.end
+            //                     })
+            //                 }
+            //             }
+            //         },
+            //         tempElementStyle(tempNumber) {
+            //             const nearDistance = 3
+            //             const liftDistance = 12
+            //
+            //             const diff = Math.abs(this.currentTemperature - tempNumber)
+            //             const distY = (diff / nearDistance) - 1
+            //             const elementY = Math.min(distY * liftDistance, 0)
+            //             return `transform: translate3d(0, ${elementY}px, 0)`
+            //         }
+            //     }
+            // })
+        </script>
+    </body>
+
+</html>

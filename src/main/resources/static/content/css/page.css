@@ -1,0 +1,63 @@
+
+.app-content {
+    /*background-color: #474f61;*/
+    background-color: #212529;
+    min-height: calc(100vh - 55px);
+    margin: 0;
+    padding: 0 10px 0 10px;
+}
+
+.app-title {
+    background-color: #20242d;
+    margin: 0;
+    margin-top: 5px;
+    padding-bottom: 5px;
+    color: #fff;
+}
+
+.row {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+
+.tile {
+    background-color: #20242d;
+    box-shadow: none;
+    padding: 0;
+    margin-bottom: 0;
+}
+
+.toggle {
+    font-size: 1.5rem;
+    color: #ffffff;
+    padding-top: 20px;
+    padding-bottom: 20px;
+}
+
+.toggle input[type="checkbox"] + .button-indecator {
+    display: inline-block;
+}
+
+/*.table > tbody > tr > td {*/
+/*border: 0px;*/
+/*}*/
+
+/*.table-title {*/
+/*color: #ffffff;*/
+/*}*/
+.table {
+    margin-bottom: 0;
+    border-right: 1px solid rgb(221, 221, 221);
+    /*margin-bottom: -1px;*/
+    /*border: 1px solid rgb(221, 221, 221);*/
+}
+
+.table > thead > tr > th, .table > tbody > tr > th, .table > tfoot > tr > th, .table > thead > tr > td, .table > tbody > tr > td, .table > tfoot > tr > td {
+    border-top: 0;
+}
+
+.col-md-12 {
+    padding-right: 0;
+    padding-left: 0;
+}
+

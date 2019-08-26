@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sylar.cetc.dao.User.EquipmentDao">
+<select id="GetEquipments" resultType="map">
+    SELECT e.id, e.equipment_code, e.name,et.code AS type_code, et.name AS type_name, et.controller AS controller FROM `t_equipment` e
+    LEFT JOIN t_equipment_type et ON et.id = e.type
+    WHERE `enable` = 1
+</select>
+
+</mapper>

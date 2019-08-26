@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:v-for="http://www.w3.org/1999/xhtml">
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+        <script th:src="@{/my/plugins/tweenmax/TweenMax.js}"></script>
+        <script th:src="@{/my/plugins/DrawSVGPlugin.min.js}"></script>
+    </head>
+    <body>
+        <svg width="100%" height="220" version="1.1"
+             xmlns="http://www.w3.org/2000/svg">
+
+            <circle cx="200" cy="150" r="50" stroke="green"
+                    stroke-width="8" fill="none" id="circle"/>
+
+        </svg>
+    </body>
+    <script>
+        var myTween=TweenLite.fromTo("#circle", 3, {drawSVG:'75% 75%'}, {drawSVG:"75% 100% "});
+    </script>
+</html>

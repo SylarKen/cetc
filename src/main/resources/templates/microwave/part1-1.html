@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>设备详情</title>
+        <link rel="stylesheet" th:href="@{/my/plugins/bootstrap/bootstrap.css}">
+        <link rel="stylesheet" th:href="@{/my/plugins/bootstrap/bootstrap-table.css}">
+        <link rel="stylesheet" th:href="@{/my/plugins/vali/main.css}">
+        <link rel="stylesheet" th:href="@{/my/plugins/font-awesome.css}">
+        <link rel="stylesheet" th:href="@{/my/plugins/fontawesome-free-5.9.0-web/css/all.css}">
+        <script th:src="@{/my/plugins/jquery/dist/jquery.js}"></script>
+        <script th:src="@{/my/plugins/vue/dist/vue.js}"></script>
+        <script th:src="@{/my/plugins/node_modules/axios/dist/axios.js}"></script>
+        <script th:src="@{/my/plugins/bootstrap/bootstrap.js}"></script>
+        <script th:src="@{/my/plugins/bootstrap/bootstrap-table.js}"></script>
+        <script th:src="@{/my/plugins/vali/main.js}"></script>
+        <script th:src="@{/my/plugins/vali/popper.min.js}"></script>
+        <style>
+            .app-content {
+                background-color: #474f61;
+                min-height: calc(100vh - 55px);
+                margin: 0;
+                padding: 0 10px 0 10px;
+            }
+
+            .app-title {
+                background-color: #20242d;
+                margin: 0;
+                margin-top: 5px;
+                padding-bottom: 5px;
+                color: #fff;
+            }
+
+            .row {
+                margin-right: 0px;
+                margin-left: 0px;
+            }
+
+            .tile {
+                background-color: #20242d;
+                box-shadow: none;
+                padding: 0;
+                margin-bottom: 0;
+            }
+
+            .toggle {
+                font-size: 1.5rem;
+                color: #ffffff;
+                padding-top: 20px;
+                padding-bottom: 20px;
+            }
+
+            .toggle input[type="checkbox"] + .button-indecator {
+                display: inline-block;
+            }
+
+            .table > tbody > tr > td {
+                border: 0px;
+            }
+
+            .table-title {
+                color: #ffffff;
+            }
+
+            .col-md-12 {
+                padding-right: 0;
+                padding-left: 0;
+            }
+        </style>
+    </head>
+    <body class="app-content">
+        <div class="app-title">
+            <div>
+                <h1><i class="fa fa-crosshairs"></i> 真空设备</h1>
+                <p onclick="reload()">设备详情</p>
+            </div>
+
+            <ul class="app-breadcrumb breadcrumb">
+                <li class="breadcrumb-item"><i class="fas fa-reply"></i></li>
+                <li class="breadcrumb-item"><a href="javascript:history.back(-1)">返回</a></li>
+            </ul>
+        </div>
+        <div class="row" id="row_client">
+            <div class="col-md-12">
+                <div class="tile">
+                    <div class="tile-body" id="tile_body">
+                        <div class="col-md-12">
+                            <div class="col-md-2" style="padding-right:0;padding-left:0;">
+                                <table data-toggle="table" class="table table-dark" id="table_1"
+                                       data-show-header="false">
+                                    <thead>
+                                    <tr>
+                                        <th data-valign="middle" data-halign="center">name</th>
+                                        <th>value</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr data-index="0">
+                                        <td style="">1号循环风机</td>
+                                        <td style="" class="toggle">
+                                            <input value="coolingFan" type="checkbox" v-model="digital"><span
+                                                class="button-indecator"></span>
+                                        </td>
+                                    </tr>
+
+                                    <tr data-index="0">
+                                        <td style="">2号循环风机</td>
+                                        <td style="" class="toggle">
+                                            <input id="Dehumidifier" type="checkbox" v-model="digital"><span
+                                                class="button-indecator"></span>
+                                        </td>
+                                    </tr>
+                                    <tr data-index="0">
+                                        <td style="">3号循环风机</td>
+                                        <td style="" class="toggle">
+                                            <input id="pump" type="checkbox" v-model="digital"><span
+                                                class="button-indecator"></span>
+                                        </td>
+                                    </tr>
+                                    <tr data-index="0">
+                                        <td style="">4号循环风机</td>
+                                        <td style="" class="toggle">
+                                            <input id="lamp" type="checkbox" v-model="digital"><span
+                                                class="button-indecator"></span>
+                                        </td>
+                                    </tr>
+                                    <tr data-index="0">
+                                        <td style="">5号循环风机</td>
+                                        <td style="" class="toggle">
+                                            <input id="drive_fwd" type="checkbox" v-model="digital"><span
+                                                class="button-indecator"></span>
+                                        </td>
+                                    </tr>
+                                    <tr data-index="0">
+                                        <td style="">6号循环风机</td>
+                                        <td style="" class="toggle">
+                                            <input id="drive_rev" type="checkbox" v-model="digital"><span
+                                                class="button-indecator"></span>
+                                        </td>
+                                    </tr>
+
+                                    <tr data-index="0">
+                                        <td style="">7号循环风机</td>
+                                        <td style="" class="toggle">
+                                            <input id="set_to_work" type="checkbox" v-model="digital"><span
+                                                class="button-indecator"></span>
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </div>
+                            <div class="col-md-2" style="padding-right:0;padding-left:0;">
+                                <table data-toggle="table" class="table table-dark" id="table_1"
+                                       data-show-header="false">
+                                    <thead>
+                                    <tr>
+                                        <th data-valign="middle" data-halign="center">name</th>
+                                        <th>value</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr data-index="0">
+                                        <td style="">1号排湿电机</td>
+                                        <td style="" class="toggle">
+                                            <input value="coolingFan" type="checkbox" v-model="digital"><span
+                                                class="button-indecator"></span>
+                                        </td>
+                                    </tr>
+
+                                    <tr data-index="0">
+                                        <td style="">2号排湿电机</td>
+                                        <td style="" class="toggle">
+                                            <input id="Dehumidifier" type="checkbox" v-model="digital"><span
+                                                class="button-indecator"></span>
+                                        </td>
+                                    </tr>
+                                    <tr data-index="0">
+                                        <td style="">3号排湿电机</td>
+                                        <td style="" class="toggle">
+                                            <input id="pump" type="checkbox" v-model="digital"><span
+                                                class="button-indecator"></span>
+                                        </td>
+                                    </tr>
+                                    <tr data-index="0">
+                                        <td style="">4号排湿电机</td>
+                                        <td style="" class="toggle">
+                                            <input id="lamp" type="checkbox" v-model="digital"><span
+                                                class="button-indecator"></span>
+                                        </td>
+                                    </tr>
+                                    <tr data-index="0">
+                                        <td style="">5号排湿电机</td>
+                                        <td style="" class="toggle">
+                                            <input id="drive_fwd" type="checkbox" v-model="digital"><span
+                                                class="button-indecator"></span>
+                                        </td>
+                                    </tr>
+                                    <tr data-index="0">
+                                        <td style="">6号排湿电机</td>
+                                        <td style="" class="toggle">
+                                            <input id="drive_rev" type="checkbox" v-model="digital"><span
+                                                class="button-indecator"></span>
+                                        </td>
+                                    </tr>
+
+                                    <tr data-index="0">
+                                        <td style="">7号排湿电机</td>
+                                        <td style="" class="toggle">
+                                            <input id="set_to_work" type="checkbox" v-model="digital"><span
+                                                class="button-indecator"></span>
+                                        </td>
+                                    </tr>
+
+                                </table>
+                            </div>
+
+                            <div class="col-md-4" style="padding-right:0;padding-left:0;">
+                                <div class="col-md-12 table-responsive">
+                                    <table data-toggle="table" class="table table-dark" id="table_2"
+                                           data-show-header="false">
+                                        <thead>
+                                        <tr>
+                                            <th data-valign="middle" data-halign="center">name</th>
+                                            <th data-valign="middle" data-align="right">value</th>
+                                            <th data-valign="middle" data-align="right">value</th>
+                                            <th data-valign="middle" data-align="right">value</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr data-index="0">
+                                            <td style="">1号压缩机</td>
+                                            <td style="" class="toggle">
+                                                1&nbsp;<input id="microwave1_1" type="checkbox"><span
+                                                    class="button-indecator"></span>
+                                            </td>
+                                            <td style="" class="toggle">
+                                                2&nbsp;<input id="microwave1_2" type="checkbox"><span
+                                                    class="button-indecator"></span>
+                                            </td>
+                                        </tr>
+                                        <tr data-index="0">
+                                            <td style="">2号压缩机</td>
+                                            <td style="" class="toggle">
+                                                1&nbsp;<input id="microwave2_1" type="checkbox"><span
+                                                    class="button-indecator"></span>
+                                            </td>
+                                            <td style="" class="toggle">
+                                                2&nbsp;<input id="microwave2_2" type="checkbox"><span
+                                                    class="button-indecator"></span>
+                                            </td>
+                                        </tr>
+                                        <tr data-index="0">
+                                            <td style="">3号压缩机</td>
+                                            <td style="" class="toggle">
+                                                1&nbsp;<input id="microwave3_1" type="checkbox"><span
+                                                    class="button-indecator"></span>
+                                            </td>
+                                            <td style="" class="toggle">
+                                                2&nbsp;<input id="microwave3_2" type="checkbox"><span
+                                                    class="button-indecator"></span>
+                                            </td>
+
+                                        </tr>
+                                        <tr data-index="0">
+                                            <td style="">4号压缩机</td>
+                                            <td style="" class="toggle">
+                                                1&nbsp;<input id="microwave4_1" type="checkbox"><span
+                                                    class="button-indecator"></span>
+                                            </td>
+                                            <td style="" class="toggle">
+                                                2&nbsp;<input id="microwave4_2" type="checkbox"><span
+                                                    class="button-indecator"></span>
+                                            </td>
+
+                                        </tr>
+                                        <tr data-index="0">
+                                            <td style="">5号压缩机</td>
+                                            <td style="" class="toggle">
+                                                1&nbsp;<input id="microwave5_1" type="checkbox"><span
+                                                    class="button-indecator"></span>
+                                            </td>
+                                            <td style="" class="toggle">
+                                                2&nbsp;<input id="microwave5_2" type="checkbox"><span
+                                                    class="button-indecator"></span>
+                                            </td>
+
+                                        </tr>
+                                        <tr data-index="0">
+                                            <td style="">6号压缩机</td>
+                                            <td style="" class="toggle">
+                                                1&nbsp;<input id="microwave6_1" type="checkbox"><span
+                                                    class="button-indecator"></span>
+                                            </td>
+                                            <td style="" class="toggle">
+                                                2&nbsp;<input id="microwave6_2" type="checkbox"><span
+                                                    class="button-indecator"></span>
+                                            </td>
+
+                                        </tr>
+                                        <tr data-index="0">
+                                            <td style="">7号压缩机</td>
+                                            <td style="" class="toggle">
+                                                1&nbsp;<input id="microwave7_1" type="checkbox"><span
+                                                    class="button-indecator"></span>
+                                            </td>
+                                            <td style="" class="toggle">
+                                                2&nbsp;<input id="microwave7_2" type="checkbox"><span
+                                                    class="button-indecator"></span>
+                                            </td>
+
+                                        </tr>
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-md-4" style="padding-right:0;padding-left:0;">
+                                <div class="col-md-12">
+                                    <table data-toggle="table" class="table table-dark" id="table_3"
+                                           data-show-header="false">
+                                        <thead>
+                                        <tr>
+                                            <th data-valign="middle" data-halign="center">name</th>
+                                            <th data-valign="middle" data-align="right">value</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr data-index="0">
+                                            <td style="">烘房温度1</td>
+                                            <td style="" class="toggle">
+                                                <span id="temperature_1" style="color:green">43.4</span>℃
+                                            </td>
+                                        </tr>
+                                        <tr data-index="0">
+                                            <td style="">烘房温度2</td>
+                                            <td style="" class="toggle">
+                                                <span id="temperature_8" style="color:green">43.4</span>℃
+                                            </td>
+                                        </tr>
+                                        <tr data-index="0">
+                                            <td style="">烘房温度3</td>
+                                            <td style="" class="toggle">
+                                                <span id="temperature_9" style="color:green">43.4</span>℃
+                                            </td>
+                                        </tr>
+                                        <tr data-index="0">
+                                            <td style="">烘房湿度1</td>
+                                            <td style="" class="toggle">
+                                                <span id="temperature_10" style="color:green">43.4</span>℃
+                                            </td>
+                                        </tr>
+                                        <tr data-index="0">
+                                            <td style="">烘房湿度2</td>
+                                            <td style="" class="toggle">
+                                                <span id="coolant_level" style="color:green">2.0</span>cm
+                                            </td>
+                                        </tr>
+
+                                        <tr data-index="0">
+                                            <td style="">烘房湿度3</td>
+                                            <td style="" class="toggle">
+                                                <span id="humidity" style="color:green">0.0</span>%
+                                            </td>
+                                        </tr>
+                                        <tr data-index="0">
+                                            <td style="">&nbsp;</td>
+                                            <td style="" class="toggle">&nbsp;</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <table data-toggle="table" class="table table-dark" id="table_6" data-show-header="false">
+                                <thead>
+                                <tr>
+                                    <th data-valign="middle" data-halign="center">name</th>
+                                    <th>value</th>
+                                    <th data-valign="middle" data-halign="center">name</th>
+                                    <th>value</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr data-index="0">
+                                    <td style="">热泵布料电机</td>
+                                    <td style="" class="toggle">
+                                        <input value="coolingFan" type="checkbox" v-model="digital"><span
+                                            class="button-indecator"></span>
+                                    </td>
+
+                                </tr>
+                                <tr>
+                                    <td style="">热泵清料电机</td>
+                                    <td style="" class="toggle">
+                                        <input value="coolingFan" type="checkbox" v-model="digital"><span
+                                            class="button-indecator"></span>
+                                    </td>
+                                </tr>
+
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </body>
+    <script>
+        var app=new Vue({
+            el:"#tile_body",
+            data(){
+                return {
+                    digital:"1"
+                }
+            },
+            mounted(){
+                var _this = this;
+                window.setInterval("getSensors(app)", 1000);
+            }
+        })
+        function getSensors(el) {
+            axios.get('/sensor/get')
+                .then(function (response) {
+                    if (response.status === 200) {
+                        el.sensors = response.data;
+                        console.log(response)
+
+                    }
+                })
+                .catch(function (error) {
+                    console.log(error);
+                });
+        }
+    </script>
+</html>

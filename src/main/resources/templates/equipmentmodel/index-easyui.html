@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>设备模型编辑</title>
+        <link rel="stylesheet" th:href="@{/my/plugins/bootstrap/bootstrap.css}">
+        <!--<link rel="stylesheet" th:href="@{/my/plugins/bootstrap/bootstrap-table.css}">-->
+        <link rel="stylesheet" th:href="@{/my/plugins/InsdepUI-for-EasyUI-1.1.0-2018041600/insdep.easyui.min.css}">
+        <link rel="stylesheet" th:href="@{/my/plugins/jquery-easyui-1.5.1/themes/icon.css}">
+        <link rel="stylesheet" th:href="@{/my/plugins/vali/main.css}">
+        <link rel="stylesheet" th:href="@{/my/plugins/font-awesome.css}">
+        <link rel="stylesheet" th:href="@{/my/plugins/fontawesome-free-5.9.0-web/css/all.css}">
+        <link rel="stylesheet" th:href="@{/my/content/css/page.css}">
+
+        <script th:src="@{/my/plugins/jquery/dist/jquery.js}"></script>
+        <script th:src="@{/my/plugins/bootstrap/bootstrap.js}"></script>
+        <script th:src="@{/my/plugins/jquery-easyui-1.5.1/jquery.easyui.min.js}"></script>
+        <script th:src="@{/my/plugins/InsdepUI-for-EasyUI-1.1.0-2018041600/insdep.extend.min.js}"></script>
+        <script th:src="@{/my/plugins/vali/main.js}"></script>
+        <script th:src="@{/my/plugins/vali/popper.min.js}"></script>
+        <style>
+            .fixed-table-container tbody .selected td {
+                background-color: #610204;
+            }
+
+            .fixed-table-pagination .pagination-info {
+                color: #ffffff;
+            }
+        </style>
+        <script>
+            // var Table_Init = function () {
+            //     var oTable_Init = new Object();
+            //     //初始化Table
+            //     oTable_Init.Init = function (id) {
+            //         $('#table').bootstrapTable({
+            //             url: '/equipmentmodel/get?id=' + id,         //请求后台的URL（*）
+            //             method: 'post',                      //请求方式（*）
+            //             // contentType: "application/x-www-form-urlencoded",
+            //             clickToSelect: true,
+            //             singleSelect: true,
+            //
+            //             toolbar: '#toolbar',                //工具按钮用哪个容器
+            //             striped: true,                      //是否显示行间隔色
+            //             cache: false,                       //是否使用缓存，默认为true，所以一般情况下需要设置一下这个属性（*）
+            //             detailView: false,
+            //             pagination: false,                   //是否显示分页（*）
+            //             sortable: true,                     //是否启用排序
+            //             sortOrder: "desc",                   //排序方式
+            //             //queryParams: oTable_Init.queryParams,//传递参数（*）
+            //             sidePagination: "server",           //分页方式：client客户端分页，server服务端分页（*）
+            //             pageNumber: 1,                       //初始化加载第一页，默认第一页
+            //             pageSize: 5,                       //每页的记录行数（*）
+            //             pageList: [5, 'All'],        //可供选择的每页的行数（*）
+            //             //search: true,                       //是否显示表格搜索，此搜索是客户端搜索，不会进服务端，所以，个人感觉意义不大
+            //             silent: true,
+            //             strictSearch: true,
+            //             showColumns: false,                  //是否显示所有的列
+            //             showExport: false,
+            //             exportDataType: "basic",
+            //             exportTypes: ['xls', 'xlsx'], //可选的导出文件类型
+            //             //exportTypes: ['xls'], //可选的导出文件类型
+            //             //showRefresh: true,                  //是否显示刷新按钮
+            //             //showToggle: true,                    //是否显示详细视图和列表视图的切换按钮
+            //             minimumCountColumns: 2,             //最少允许的列数
+            //             //height: 280,                        //行高，如果没有设置height属性，表格自动根据记录条数觉得表格高度
+            //             uniqueId: "ID",                     //每一行的唯一标识，一般为主键列
+            //             cardView: false,                    //是否显示详细视图
+            //             queryParams: function (param) {
+            //                 //param.limit = param.limit;   //页面大小
+            //                 //return param;
+            //                 var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+            //                     limit: param.limit,   //页面大小
+            //                     offset: param.offset,  //页码
+            //                     state: '1',
+            //                     goodName: $('#txt_goodName_serch').val(),
+            //                     code: $('#txt_goodCode_serch').val(),
+            //                     goodClass: $('#txt_goodClass_serch').val()
+            //                     //statu: $("#txt_search_statu").val()
+            //                 };
+            //                 return temp;
+            //             },
+            //             columns: [
+            //                 {
+            //                     field: 'checkbox',
+            //                     title: '',
+            //                     checkbox: true
+            //                 },
+            //                 {
+            //                     field: 'id',
+            //                     title: '',
+            //                     visible: false
+            //                 },
+            //                 {
+            //                     field: 'name',
+            //                     title: '设备类型',
+            //                     halign: 'center',
+            //                     align: 'center',
+            //                     formatter: function (value, row) {
+            //                         return '<span title="' + value + '">' + value + ' </span>';
+            //                     }
+            //                 },
+            //                 {
+            //                     field: 'code',
+            //                     title: '设备类型编号',
+            //                     halign: 'center',
+            //                     align: 'center',
+            //                     formatter: function (value, row) {
+            //                         return '<span title="' + value + '">' + value + ' </span>';
+            //                     }
+            //                 },
+            //                 {
+            //                     field: 'controller',
+            //                     title: '系统指向',
+            //                     halign: 'center',
+            //                     align: 'center',
+            //                     formatter: function (value, row) {
+            //                         return '<span title="' + value + '">' + value + ' </span>';
+            //                     }
+            //                 }, {
+            //                     field: '',
+            //                     title: '编辑',
+            //                     halign: 'center',
+            //                     align: 'center',
+            //                     formatter: function (value, row) {
+            //                         return '<button  type="button" class="btn btn-default btn-sm" onclick="Edit(\'' + row.id + '\')">编辑</button>';
+            //                     }
+            //                 }
+            //             ],
+            //             onLoadSuccess: function (data) {
+            //             },
+            //             onClickRow: function (row) {
+            //             }
+            //         });
+            //     };
+            //     // //得到查询的参数
+            //     // oTable_Init.queryParams = function (params) {
+            //     //     var temp = {   //这里的键的名字和控制器的变量名必须一直，这边改动，控制器也需要改成一样的
+            //     //         limit: 10,// params.limit,   //页面大小
+            //     //         offset: params.offset,  //页码
+            //     //         state: '1',
+            //     //         goodName: $('#txt_goodName_serch').val(),
+            //     //         code: $('#txt_goodCode_serch').val(),
+            //     //         goodClass: $('#txt_goodClass_serch').val()
+            //     //         //statu: $("#txt_search_statu").val()
+            //     //     };
+            //     //     return temp;
+            //     // };
+            //     return oTable_Init;
+            // }
+            //
+            // function Edit(id) {
+            //     window.location.href = "/equipmentmodel/index?id=" + id;
+            // }
+        </script>
+    </head>
+    <body class="app-content">
+        <div class="app-title">
+            <div>
+                <h1><i class="fa fa-crosshairs"></i> 设备模型编辑</h1>
+                <p onclick="reload()">设备类型</p>
+                <input id="hd_id" th:value="${id}" hidden="hidden">
+            </div>
+
+            <ul class="app-breadcrumb breadcrumb">
+                <li class="breadcrumb-item"><i class="fas fa-reply"></i></li>
+                <li class="breadcrumb-item"><a href="javascript:history.back(-1)">返回</a></li>
+            </ul>
+        </div>
+        <div class="row" id="row_client">
+            <div class="col-md-12">
+                <div class="tile">
+                    <div class="tile-body" id="tile_body">
+                        <div class="col-md-12">
+
+                            <div class="col-md-12 table-responsive">
+
+
+                                <table id="table" data-toggle="table" class="table table-dark"
+                                       data-show-header="true">
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            var id = $('#hd_id').val()
+            var oTable = new Table_Init();
+            oTable.Init(id);
+
+            $('#table').datagrid({
+                title: 'Editable DataGrid',
+                method: 'post',
+                iconCls: 'icon-edit',
+                width: 660,
+                height: 250,
+                singleSelect: true,
+                toolbar: '#toolbar',
+                idField: 'itemid',
+                url: '/equipmentmodel/get?id=' + id,
+                columns: [
+                    {field: 'id', title: 'Item ID', width: 60}
+                ],
+                onEndEdit: function (index, row) {
+                    var ed = $(this).datagrid('getEditor', {
+                        index: index,
+                        field: 'productid'
+                    });
+                    row.productname = $(ed.target).combobox('getText');
+                },
+                onBeforeEdit: function (index, row) {
+                    row.editing = true;
+                    $(this).datagrid('refreshRow', index);
+                },
+                onAfterEdit: function (index, row) {
+                    row.editing = false;
+                    $(this).datagrid('refreshRow', index);
+                },
+                onCancelEdit: function (index, row) {
+                    row.editing = false;
+                    $(this).datagrid('refreshRow', index);
+                }
+            });
+
+        </script>
+    </body>
+</html>

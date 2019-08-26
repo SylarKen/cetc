@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sylar.cetc.dao.User.SensorDao">
+    <select id="Get" resultType="Map" parameterType="int">
+SELECT * FROM t_equipment_model em
+LEFT JOIN t_sensors s on em.`code` = s.code
+LEFT JOIN t_equipment_type et on et.code = em.equipment_type
+WHERE 1 = 1
+AND em.`enable` = 1
+AND s.equipment_code = (
+		SELECT equipment_code FROM t_equipment
+		WHERE id = #{id}
+)
+    </select>
+
+</mapper>
